@@ -1,0 +1,37 @@
+{
+  "name": "learn-prisma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "build": "rimraf ./build && tsc",
+    "lint": "eslint . --ext .ts",
+    "dev": "nodemon",
+    "start": "npm run build && node build/index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "prisma",
+    "git-hook"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^16.7.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "husky": "^7.0.1",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
+    "prisma": "^2.29.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.3.5"
+  }
+}

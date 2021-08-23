@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+    // "jest"
+  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "rules": {
+    "indent": ["warn", "tab", { "SwitchCase": 1 }],
+    "max-len": ["off"],
+    "quotes": ["warn", "single"],
+    "semi": ["error", "always"],
+    "no-var": ["error"],
+    "no-console": ["off"],
+    "no-tabs": ["off"],
+    "no-unused-vars": ["warn"],
+    "no-mixed-spaces-and-tabs": ["warn"],
+    "func-names": "off",
+    "global-require": "off",
+    "linebreak-style": ["error", "windows"]
+  },
+  "env": {
+    "browser": true,
+    "node": true
+    // "jest/globals": true
+  }
+}
