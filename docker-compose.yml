@@ -10,12 +10,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: prisma
     volumes:
       # seeding scripts
-      - ./.docker/mongo-entrypoint:/docker-entrypoint-initdb.d
+      - ./.docker/mongo-entrypoint:/docker-entrypoint-initdb.d # mount volume trực tiếp. Thì không cần khai báo bên dưới
       # named volumes
-      - mongodb_replica_data:/data/db # Enable persistence of db
+      - mongodb_replica_data:/data/db # Enable persistence of db # mount volume theo kiểu khai báo biến (development way)
     ports:
       - 37017:27017
-      - 27017:27017
+      - 27017:27017 # required and disable service mongo local at port 27017 if exists
 volumes:
   # default dir on Ubuntu: /var/lib/docker/volumes
   mongodb_replica_data:

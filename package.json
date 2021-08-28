@@ -8,6 +8,7 @@
     "prepare": "husky install",
     "build": "rimraf ./build && tsc",
     "lint": "eslint . --ext .ts",
+    "lint-and-fix": "eslint . --ext .ts --fix",
     "dev": "nodemon",
     "start": "npm run build && node build/index.js"
   },
@@ -30,13 +31,17 @@
     "husky": "^7.0.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
-    "prisma": "^2.29.1",
+    "prisma": "^2.30.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5"
   },
   "dependencies": {
     "@prisma/client": "^2.30.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "nexus": "^1.1.0",
+    "graphql": "^15.5.1",
+    "graphql-scalars": "^1.10.0",
+    "apollo-server": "^3.3.0"
   }
 }

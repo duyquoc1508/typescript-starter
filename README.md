@@ -58,3 +58,9 @@ Builds the app at build, cleaning the folder first.
 npm run test
 ```
 Runs the jest tests once.
+
+2. Create and seed the database
+Seed the database with the sample data in prisma/seed.ts by running the following command:
+```
+npx prisma db seed --preview-feature
+```
