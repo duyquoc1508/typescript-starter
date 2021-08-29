@@ -8,7 +8,10 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
+  createPost(authorId: String!, data: PostCreateInput!): Post
   createUser(data: UserCreateInput!): User!
+  incrementPostViewCount(id: String!): Post
+  togglePublishPost(id: String!): Post
 }
 
 type Post {
@@ -27,8 +30,16 @@ input PostCreateInput {
   title: String!
 }
 
+type Product {
+  id: ID!
+  name: String!
+  price: Int!
+}
+
 type Query {
-  allUsers: [User!]!
+  allPosts: [Post]!
+  allUsers: [User]!
+  postById(id: String!): Post!
 }
 
 type User {

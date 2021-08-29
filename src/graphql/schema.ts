@@ -1,7 +1,15 @@
-import { makeSchema, objectType, arg, nonNull, asNexusMethod, inputObjectType } from 'nexus';
-import { Context } from './context';
+import {
+	makeSchema,
+	objectType,
+	arg,
+	nonNull,
+	asNexusMethod,
+	inputObjectType,
+	stringArg,
+} from 'nexus';
+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'; // auto create CURD
 import { DateTimeResolver } from 'graphql-scalars';
-import { ObjectDefinitionBlock } from 'nexus/dist/blocks';
+import { Context } from './context';
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'date');
 
@@ -49,15 +57,47 @@ const User = objectType({
 	},
 });
 
+const Product = objectType({
+	name: 'Product',
+	definition(t) {
+		t.nonNull.id('id');
+		t.nonNull.string('name');
+		t.nonNull.int('price');
+	},
+});
+
 const Query = objectType({
 	name: 'Query',
 	definition(t) {
-		t.nonNull.list.nonNull.field('allUsers', {
+		t.nonNull.list.field('allUsers', {
 			type: 'User',
 			resolve: (_parent, _args, context: Context) => {
 				return context.prisma.user.findMany();
 			},
 		});
+
+		t.nonNull.list.field('allPosts', {
+			type: Post,
+			resolve: (_parent, _args, context: Context) => {
+				return context.prisma.post.findMany();
+			},
+		});
+
+		t.nonNull.field('postById', {
+			type: Post,
+			args: {
+				id: nonNull(stringArg()),
+			},
+			resolve: (_parent, args, context: Context) => {
+				return context.prisma.post.findUnique({
+					where: {
+						id: args.id || undefined,
+					},
+				});
+			},
+		});
+
+		// t.crud.comment();
 	},
 });
 
@@ -82,7 +122,7 @@ const UserCreateInput = inputObjectType({
 
 const Mutation = objectType({
 	name: 'Mutation',
-	definition(t: ObjectDefinitionBlock<'Mutation'>) {
+	definition(t) {
 		t.nonNull.field('createUser', {
 			type: User,
 			args: {
@@ -110,11 +150,91 @@ const Mutation = objectType({
 				});
 			},
 		});
+
+		t.field('togglePublishPost', {
+			type: Post,
+			args: {
+				id: nonNull(stringArg()),
+			},
+			resolve: async (_parent, args, ctx: Context) => {
+				const post = await ctx.prisma.post.findUnique({
+					where: {
+						id: args.id,
+					},
+					select: {
+						published: true,
+					},
+				});
+				if (!post) {
+					return {
+						message: 'Không tìm thất thông tin bài viết',
+					};
+				}
+				return ctx.prisma.post.update({
+					where: {
+						id: args.id,
+					},
+					data: {
+						published: !post.published,
+					},
+				});
+			},
+		});
+
+		t.field('incrementPostViewCount', {
+			type: Post,
+			args: {
+				id: nonNull(stringArg()),
+			},
+			resolve: (_parent, args, ctx: Context) => {
+				return ctx.prisma.post.update({
+					where: {
+						id: args.id,
+					},
+					data: {
+						viewCount: {
+							increment: 1,
+						},
+					},
+				});
+			},
+		});
+
+		t.field('createPost', {
+			type: 'Post',
+			args: {
+				data: nonNull(
+					arg({
+						type: PostCreateInput,
+					}),
+				),
+				authorId: nonNull(stringArg()),
+			},
+			resolve: (_parent, args, context: Context) => {
+				return context.prisma.post.create({
+					data: {
+						title: args.data.title,
+						content: args.data.content,
+						author: {
+							connect: { id: args.authorId },
+						},
+					},
+				});
+			},
+		});
 	},
 });
 
+const nexusPrisma = nexusSchemaPrisma({
+	experimentalCRUD: true,
+	paginationStrategy: 'prisma',
+	//prismaClient: (ctx: Context) => ctx.prisma,
+});
+
 export const schema = makeSchema({
-	types: [User, Post, Query, Mutation, DateTime, UserCreateInput, PostCreateInput],
+	types: { Query, Mutation, DateTime, Product },
+	// plugins: [nexusPrisma], // auto create curd
+	// types: [User, Post, Query, Mutation, DateTime, UserCreateInput, PostCreateInput],
 	outputs: {
 		schema: __dirname + '/../../schema.graphql',
 		typegen: __dirname + '/generated/nexus.ts',

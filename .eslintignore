@@ -4,4 +4,4 @@ node_modules
 build
 # don't lint nyc coverage output
 coverage
-/graphql/generated
+/src/graphql/generated/*
