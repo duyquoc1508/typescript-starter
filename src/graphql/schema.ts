@@ -66,6 +66,32 @@ const Product = objectType({
 	},
 });
 
+const PostCreateInput = inputObjectType({
+	name: 'PostCreateInput',
+	definition(t) {
+		t.nonNull.string('title');
+		t.nonNull.string('content');
+	},
+});
+
+const UserCreateInput = inputObjectType({
+	name: 'UserCreateInput',
+	definition(t) {
+		t.nonNull.string('email');
+		t.nonNull.string('name');
+		t.list.field('posts', {
+			type: PostCreateInput,
+		});
+	},
+});
+
+const UserUniqueInput = inputObjectType({
+	name: 'UserUniqueInput',
+	definition(t) {
+		t.nonNull.id('id');
+	},
+});
+
 const Query = objectType({
 	name: 'Query',
 	definition(t) {
@@ -97,25 +123,31 @@ const Query = objectType({
 			},
 		});
 
-		// t.crud.comment();
-	},
-});
-
-const PostCreateInput = inputObjectType({
-	name: 'PostCreateInput',
-	definition(t) {
-		t.nonNull.string('title');
-		t.nonNull.string('content');
-	},
-});
-
-const UserCreateInput = inputObjectType({
-	name: 'UserCreateInput',
-	definition(t) {
-		t.nonNull.string('email');
-		t.nonNull.string('name');
-		t.list.field('posts', {
-			type: PostCreateInput,
+		// if return is array => t.list
+		t.list.field('postsPublishedByUser', {
+			type: Post,
+			args: {
+				userUniqueInput: nonNull(
+					arg({
+						type: UserUniqueInput,
+						description: 'Thông tin user',
+					}),
+				),
+			},
+			resolve: async (_parent, args, ctx: Context) => {
+				console.log(args.userUniqueInput);
+				return await ctx.prisma.user
+					.findUnique({
+						where: {
+							id: args.userUniqueInput.id,
+						},
+					})
+					.posts({
+						where: {
+							published: true,
+						},
+					});
+			},
 		});
 	},
 });
@@ -218,6 +250,20 @@ const Mutation = objectType({
 						author: {
 							connect: { id: args.authorId },
 						},
+					},
+				});
+			},
+		});
+
+		t.field('deletePost', {
+			type: Post,
+			args: {
+				id: nonNull(stringArg()),
+			},
+			resolve: (_parent, args, ctx: Context) => {
+				return ctx.prisma.post.delete({
+					where: {
+						id: args.id,
 					},
 				});
 			},

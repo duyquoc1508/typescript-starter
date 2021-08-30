@@ -10,6 +10,7 @@ scalar DateTime
 type Mutation {
   createPost(authorId: String!, data: PostCreateInput!): Post
   createUser(data: UserCreateInput!): User!
+  deletePost(id: String!): Post
   incrementPostViewCount(id: String!): Post
   togglePublishPost(id: String!): Post
 }
@@ -40,6 +41,10 @@ type Query {
   allPosts: [Post]!
   allUsers: [User]!
   postById(id: String!): Post!
+  postsPublishedByUser(
+    """Thông tin user"""
+    userUniqueInput: UserUniqueInput!
+  ): [Post]
 }
 
 type User {
@@ -53,4 +58,8 @@ input UserCreateInput {
   email: String!
   name: String!
   posts: [PostCreateInput]
+}
+
+input UserUniqueInput {
+  id: ID!
 }
